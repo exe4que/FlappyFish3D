@@ -10,31 +10,43 @@ public class Fishy : MonoBehaviour
     public float Speed = 20f;
     public float JumpForce = 5f;
     public float CeilingHeight = 10f;
+    public Transform AnimatedChild;
+    public TrailRenderer Trail;
     
     private GameManager _gameManager;
     private Vector3 _velocity;
     private bool _isDead = false;
+    private Vector3 _startPosition;
+
+    private void Awake()
+    {
+        _startPosition = transform.position;
+    }
+
+    private void Update()
+    {
+        // Check for jump input
+        if (JumpAction.action.triggered)
+        {
+            _velocity.y = JumpForce;
+        }
+        
+        AnimatedChild.rotation = Quaternion.LookRotation(_velocity);
+    }
 
     // Update is called once per frame
     private void FixedUpdate()
     {
         if (_isDead) return;
+        if (!_gameManager.IsGameRunning()) return;
         
         // Apply forward movement
         _velocity.z = Speed;
         
         // Apply gravity
         _velocity.y += Gravity * Time.fixedDeltaTime;
-
-        // Check for jump input
-        if (JumpAction.action.WasPressedThisFrame())
-        {
-            Debug.Log("key pressed");
-            _velocity.y = JumpForce;
-        }
-
+        
         // Move the fishy
-        //transform.position += _velocity * Time.fixedDeltaTime;
         Body.MovePosition(transform.position + _velocity * Time.fixedDeltaTime);
 
         // Clamp the position to prevent going too high
@@ -68,5 +80,14 @@ public class Fishy : MonoBehaviour
     public void SetGameManager(GameManager gameManager)
     {
         _gameManager = gameManager;
+    }
+    
+    public void Reset()
+    {
+        transform.position = _startPosition;
+        AnimatedChild.rotation = Quaternion.identity;
+        _velocity = Vector3.zero;
+        _isDead = false;
+        Trail.Clear();
     }
 }
