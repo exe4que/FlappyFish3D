@@ -25,6 +25,8 @@ public class Fishy : MonoBehaviour
 
     private void Update()
     {
+        if (_isDead) return;
+        if (!_gameManager.IsGameRunning()) return;
         // Check for jump input
         if (JumpAction.action.triggered)
         {
