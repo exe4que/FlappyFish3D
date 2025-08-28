@@ -4,6 +4,7 @@ using UnityEngine.InputSystem;
 
 public class Fishy : MonoBehaviour
 {
+    #region NotReset
     public Rigidbody Body;
     public InputActionReference JumpAction;
     public float Gravity = -10f;
@@ -12,6 +13,8 @@ public class Fishy : MonoBehaviour
     public float CeilingHeight = 10f;
     public Transform AnimatedChild;
     public TrailRenderer Trail;
+    public AudioSource JumpSound;
+    public AudioSource DeathSound;
     
     private GameManager _gameManager;
     private Vector3 _velocity;
@@ -22,26 +25,33 @@ public class Fishy : MonoBehaviour
     {
         _startPosition = transform.position;
     }
-
+    #endregion
     private void Update()
     {
+        #region NotReset
         if (_isDead) return;
+        #endregion
         if (!_gameManager.IsGameRunning()) return;
+        #region NotReset
         // Check for jump input
         if (JumpAction.action.triggered)
         {
             _velocity.y = JumpForce;
+            JumpSound.Play();
         }
         
         AnimatedChild.rotation = Quaternion.LookRotation(_velocity);
+        #endregion
     }
 
     // Update is called once per frame
     private void FixedUpdate()
     {
+        #region NotReset
         if (_isDead) return;
+        #endregion
         if (!_gameManager.IsGameRunning()) return;
-        
+        #region NotReset
         // Apply forward movement
         _velocity.z = Speed;
         
@@ -65,17 +75,20 @@ public class Fishy : MonoBehaviour
         {
             Die();
         }
+        #endregion
     }
-
+    #region NotReset
     private void OnCollisionEnter(Collision other)
     {
         Die();
     }
-
+    #endregion
+    #region UI
     private void Die()
     {
         Debug.Log("Fishy has died!");
         _isDead = true;
+        DeathSound.Play();
         _gameManager.OnPlayerDeath();
     }
 
@@ -83,7 +96,7 @@ public class Fishy : MonoBehaviour
     {
         _gameManager = gameManager;
     }
-    
+    #endregion
     public void Reset()
     {
         transform.position = _startPosition;
